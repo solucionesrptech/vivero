@@ -1,0 +1,34 @@
+import Image from "next/image";
+import type { FeaturedProduct } from "@/lib/data/home-mock";
+
+type ProductCardProps = {
+  product: FeaturedProduct;
+};
+
+export function ProductCard({ product }: ProductCardProps) {
+  return (
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-sm transition-shadow hover:shadow-md">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-background">
+        <Image
+          src={product.imageSrc}
+          alt={product.imageAlt}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      </div>
+      <div className="flex flex-1 flex-col gap-2 p-5">
+        <p className="text-xs font-medium uppercase tracking-wider text-accent">
+          {product.categoryName}
+        </p>
+        <h3 className="font-display text-xl text-foreground">{product.name}</h3>
+        <p className="line-clamp-2 text-sm leading-relaxed text-muted">
+          {product.shortDescription}
+        </p>
+        <p className="mt-auto pt-2 text-sm font-medium text-primary">
+          {product.priceLabel}
+        </p>
+      </div>
+    </article>
+  );
+}

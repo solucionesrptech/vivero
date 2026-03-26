@@ -1,0 +1,17 @@
+{
+	"folders": [
+	  {
+		"name": "root",
+		"path": "."
+	  },
+	  {
+		"name": "frontend",
+		"path": "labplantalia"
+	  },
+	  {
+		"name": "backend",
+		"path": "lab-plantalia-api"
+	  }
+	],
+	"settings": {}
+  }

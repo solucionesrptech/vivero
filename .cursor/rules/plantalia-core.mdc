@@ -1,0 +1,69 @@
+---
+description: Core global de trabajo para Vivero Plantalia
+alwaysApply: true
+---
+
+# Vivero Plantalia - Core Global
+
+## Identidad del proyecto
+- Proyecto: Vivero Plantalia
+- Rubro: vivero / tienda de plantas
+- Enfoque de marca: naturaleza, calma, crecimiento, bienestar y vida sustentable
+- Categorias base: Philodendros, Alocasias, Suculentas y Varios
+- Direccion de referencia: Subida a la Iglesia #2, Laguna Verde, Valparaiso
+
+## Objetivo del proyecto
+Construir una web clara, estetica y funcional para Vivero Plantalia.
+La experiencia debe sentirse simple, moderna, natural y confiable.
+
+## Regla principal
+- PROHIBIDO romper funcionalidad existente.
+- PROHIBIDO inventar requisitos o estructuras sin justificar.
+- SIEMPRE priorizar cambios pequenos, claros y seguros.
+- SIEMPRE respetar el alcance solicitado.
+
+## Forma de trabajo
+1. Analizar
+2. Disenar
+3. Ejecutar
+4. Validar
+
+Antes de tocar codigo:
+- Entender el objetivo exacto.
+- Detectar el archivo correcto para el cambio.
+- Evaluar impacto real.
+- Aplicar el cambio minimo posible.
+
+## Reglas de arquitectura
+- Mantener arquitectura simple, escalable y entendible.
+- No mezclar logica visual con logica de negocio.
+- No mezclar acceso a datos con reglas de negocio.
+- No duplicar validaciones sin necesidad real.
+- No inventar campos o relaciones sin justificacion.
+
+## Reglas de frontend
+- Priorizar mobile-first.
+- No usar estilos inline.
+- No usar `!important`.
+- Mantener interfaz limpia, natural y consistente con la marca.
+
+## Reglas de backend
+- Respetar separacion de responsabilidades por capa.
+- Evitar logica de negocio en controladores.
+- Evitar acceso a datos fuera de la capa correspondiente.
+
+## Seguridad minima
+- Validar inputs en endpoints.
+- No exponer datos sensibles en respuestas o logs.
+- Proteger endpoints publicos con controles basicos.
+- Aplicar controles seguros para archivos o imagenes cuando existan.
+
+## Clean code
+- Responsabilidad clara por archivo y capa.
+- Nombres explicitos y consistentes.
+- Evitar duplicacion, funciones gigantes y complejidad innecesaria.
+- Priorizar legibilidad y mantenibilidad.
+
+## Criterio final
+Si una solucion es mas compleja que el problema, no sirve.
+Si un cambio toca demasiadas cosas, probablemente esta mal planteado.
