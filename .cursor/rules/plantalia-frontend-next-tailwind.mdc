@@ -1,0 +1,58 @@
+---
+description: Estandares frontend Next.js y Tailwind para Plantalia
+globs: labplantalia/**/*.{ts,tsx,js,jsx,css}
+alwaysApply: false
+---
+
+# Plantalia - Frontend Next.js + Tailwind
+
+## Estructura y responsabilidad
+- Organizar por features o dominio, evitando carpetas ambiguas.
+- Separar UI de logica de datos y consumo de API.
+- Evitar componentes gigantes; extraer piezas reutilizables.
+
+## Estilos y diseno
+- Mobile-first por defecto.
+- No usar estilos inline.
+- No usar `!important`.
+- Resolver conflictos de estilos por arquitectura de componentes y clases utilitarias.
+- Mantener interfaz limpia, natural y consistente con la marca.
+
+## Calidad de codigo
+- Nombres claros para componentes, hooks y utilidades.
+- Evitar duplicacion de logica de presentacion o fetch.
+- Manejar estados de carga, vacio y error de forma explicita.
+- Priorizar legibilidad y mantenibilidad sobre atajos rapidos.
+
+## Regla de ejecucion obligatoria
+
+Antes de modificar codigo, se debe:
+
+1. Analizar el problema
+2. Proponer un plan de cambios
+3. Indicar archivos a modificar
+4. Evaluar impacto
+5. Luego implementar
+
+Prohibido:
+- Implementar directamente sin analisis
+- Hacer cambios fuera del alcance
+- Refactorizar innecesariamente
+- Inventar requisitos no definidos
+
+## Control de cambios
+
+- Los cambios deben ser pequenos y localizados
+- No modificar archivos fuera del objetivo
+- No agregar dependencias sin justificar
+
+## Evolucion de reglas
+
+Si se detecta:
+- error repetido
+- patron recurrente
+- mejora arquitectonica clara
+
+Se debe:
+- proponer actualizar la Cursor Rule
+- mantener consistencia con reglas existentes

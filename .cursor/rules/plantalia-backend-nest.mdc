@@ -1,0 +1,27 @@
+---
+description: Estandares de arquitectura backend NestJS para Plantalia
+globs: lab-plantalia-api/src/**/*.ts
+alwaysApply: false
+---
+
+# Plantalia - Backend NestJS
+
+## Limites por capa
+- Controller: parseo HTTP, codigos de estado y respuesta; sin logica de negocio.
+- DTO: contrato de entrada y validacion de formato.
+- Facade: orquestacion de casos de uso; sin Prisma ni queries.
+- BLL: reglas de negocio y decisiones funcionales.
+- DAL: consultas y persistencia; unico punto con Prisma.
+
+## Reglas de implementacion
+- No importar PrismaClient fuera de DAL.
+- No acceder a repositorios o DAL desde Controller.
+- Evitar validaciones de negocio en DTO.
+- Mantener servicios y metodos enfocados en una sola responsabilidad.
+- Manejar errores de dominio de forma consistente y mapearlos en capa HTTP.
+
+## Seguridad y calidad
+- Validar y sanear input antes de ejecutar casos de uso.
+- No retornar campos sensibles.
+- Evitar logs con payload completo si contiene datos sensibles.
+- Escribir codigo legible, con nombres de dominio claros.
