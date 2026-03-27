@@ -26,7 +26,7 @@ export function Categories() {
           {categories.map((cat) => (
             <li key={cat.id}>
               <Link
-                href="#destacados"
+                href={`/categoria/${cat.slug}`}
                 className="group relative block aspect-[3/4] w-full overflow-hidden rounded-2xl border border-border-subtle shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
               >
                 <Image
