@@ -1,0 +1,15 @@
+{
+  "name": "vivero",
+  "private": true,
+  "workspaces": [
+    "labplantalia"
+  ],
+  "scripts": {
+    "build": "npm run build -w labplantalia",
+    "dev": "npm run dev -w labplantalia",
+    "lint": "npm run lint -w labplantalia"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
