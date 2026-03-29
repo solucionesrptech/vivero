@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant, DM_Sans } from "next/font/google";
+import { Providers } from "@/app/providers";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -30,7 +31,9 @@ export default function RootLayout({
       lang="es"
       className={`${dmSans.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

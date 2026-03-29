@@ -1,17 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useId, useState } from "react";
 import type { CatalogProduct } from "@/lib/types/catalog-product";
 import type { CartLineDraft } from "@/lib/types/cart-selection";
 import { AvailabilityBadge } from "@/components/catalog/AvailabilityBadge";
+import { CatalogProductImage } from "@/components/catalog/CatalogProductImage";
 
 type ProductSelectionModalProps = {
   product: CatalogProduct;
   open: boolean;
   onClose: () => void;
-  /** Cuando exista carrito: conectar aquí (contexto, API, etc.). */
-  onAddToCart?: (draft: CartLineDraft) => void;
+  /** Conectar con carrito (API / contexto). Si falla la promesa, el modal permanece abierto. */
+  onAddToCart?: (draft: CartLineDraft) => void | Promise<void>;
 };
 
 export function ProductSelectionModal({
@@ -22,17 +22,21 @@ export function ProductSelectionModal({
 }: ProductSelectionModalProps) {
   const titleId = useId();
   const [qty, setQty] = useState(1);
+  const [adding, setAdding] = useState(false);
 
   const maxQty = !product.isAvailable
     ? 0
     : product.stock === null
       ? 10
-      : Math.min(Math.max(product.stock, 0), 99);
+      : Math.max(product.stock, 0);
 
   const canAdd = product.isAvailable && maxQty > 0;
 
   useEffect(() => {
-    if (open) setQty(1);
+    if (open) {
+      setQty(1);
+      setAdding(false);
+    }
   }, [open, product.id]);
 
   useEffect(() => {
@@ -46,14 +50,25 @@ export function ProductSelectionModal({
 
   if (!open) return null;
 
-  function handleAddToCart() {
-    if (!canAdd) return;
+  async function handleAddToCart() {
+    if (!canAdd || adding) return;
     const draft: CartLineDraft = {
       productId: product.id,
       quantity: qty,
       product,
     };
-    onAddToCart?.(draft);
+    if (onAddToCart) {
+      setAdding(true);
+      try {
+        await onAddToCart(draft);
+        onClose();
+      } catch {
+        /* El error queda en CartProvider; no cerrar el modal ni propagar el rechazo */
+      } finally {
+        setAdding(false);
+      }
+      return;
+    }
     onClose();
   }
 
@@ -85,7 +100,7 @@ export function ProductSelectionModal({
 
         <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="relative aspect-[4/3] w-full bg-background sm:aspect-[16/10] lg:aspect-auto lg:min-h-[430px]">
-            <Image
+            <CatalogProductImage
               src={product.imageSrc}
               alt={product.imageAlt}
               fill
@@ -116,7 +131,21 @@ export function ProductSelectionModal({
 
             {canAdd ? (
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-muted">
+                {product.stock !== null ? (
+                  <p className="text-sm text-muted">
+                    {product.stock > 0 ? (
+                      <>
+                        Disponibles:{" "}
+                        <span className="font-semibold tabular-nums text-foreground">
+                          {product.stock}
+                        </span>
+                      </>
+                    ) : (
+                      <span>No disponible</span>
+                    )}
+                  </p>
+                ) : null}
+                <p className="mt-3 text-xs font-medium uppercase tracking-wider text-muted">
                   Cantidad
                 </p>
                 <div className="mt-2 flex items-center justify-center gap-3 rounded-full border border-border-subtle bg-background px-2 py-2">
@@ -145,19 +174,19 @@ export function ProductSelectionModal({
               </div>
             ) : (
               <p className="text-sm leading-relaxed text-muted">
-                Producto agotado. Puedes revisar otras opciones en el catálogo o
-                consultarnos en el vivero.
+                Este producto no está disponible por ahora. Puedes revisar otras
+                opciones en el catálogo o consultarnos en el vivero.
               </p>
             )}
 
             <div className="mt-2 flex flex-col gap-3 sm:flex-row-reverse sm:gap-3">
               <button
                 type="button"
-                disabled={!canAdd}
-                onClick={handleAddToCart}
+                disabled={!canAdd || adding}
+                onClick={() => void handleAddToCart()}
                 className="w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-surface transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45 sm:flex-1"
               >
-                Agregar al carrito
+                {adding ? "Agregando…" : "Agregar al carrito"}
               </button>
               <button
                 type="button"

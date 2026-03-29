@@ -14,7 +14,7 @@ export function AvailabilityBadge({
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider ${isAvailable ? "bg-accent/15 text-primary" : "bg-background text-muted"} ${className}`}
     >
-      {isAvailable ? "Disponible" : "Agotado"}
+      {isAvailable ? "Disponible" : "No disponible"}
     </span>
   );
 }
