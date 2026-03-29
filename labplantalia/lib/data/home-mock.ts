@@ -76,7 +76,7 @@ export const categories: CategoryCard[] = [
 
 export const featuredProducts: FeaturedProduct[] = [
   {
-    id: "1",
+    id: "p1",
     name: "Philodendron Brasil",
     slug: "philodendron-brasil",
     categoryId: "philodendros",
@@ -87,7 +87,7 @@ export const featuredProducts: FeaturedProduct[] = [
     shortDescription: "Enredadera amable, ideal para estantes altos y luz indirecta.",
   },
   {
-    id: "2",
+    id: "a1",
     name: "Alocasia Polly",
     slug: "alocasia-polly",
     categoryId: "alocasias",
@@ -98,7 +98,7 @@ export const featuredProducts: FeaturedProduct[] = [
     shortDescription: "Hojas con nervadura marcada; un punto focal en cualquier ambiente.",
   },
   {
-    id: "3",
+    id: "s1",
     name: "Echeveria elegans",
     slug: "echeveria-elegans",
     categoryId: "suculentas",
@@ -109,7 +109,7 @@ export const featuredProducts: FeaturedProduct[] = [
     shortDescription: "Roseta compacta, bajo riego y mucha luz.",
   },
   {
-    id: "4",
+    id: "v1",
     name: "Monstera deliciosa",
     slug: "monstera-deliciosa",
     categoryId: "varios",
@@ -120,7 +120,7 @@ export const featuredProducts: FeaturedProduct[] = [
     shortDescription: "Clásico atemporal; crece con personalidad en espacios amplios.",
   },
   {
-    id: "5",
+    id: "v2",
     name: "Calathea orbifolia",
     slug: "calathea-orbifolia",
     categoryId: "varios",
@@ -131,7 +131,7 @@ export const featuredProducts: FeaturedProduct[] = [
     shortDescription: "Follaje redondeado con rayas plateadas; ama la humedad ambiental.",
   },
   {
-    id: "6",
+    id: "pg1",
     name: "Pothos golden",
     slug: "pothos-golden",
     categoryId: "philodendros",
@@ -142,7 +142,7 @@ export const featuredProducts: FeaturedProduct[] = [
     shortDescription: "Resistente y versátil; perfecto para empezar.",
   },
   {
-    id: "7",
+    id: "f1",
     name: "Figura cerámica para maceta",
     slug: "figura-ceramica-maceta",
     categoryId: "figuras-a-mano",
@@ -154,7 +154,7 @@ export const featuredProducts: FeaturedProduct[] = [
       "Detalle artesanal que acompaña tus plantas sin restar protagonismo al follaje.",
   },
   {
-    id: "8",
+    id: "f2",
     name: "Adorno rústico de jardín",
     slug: "adorno-rustico-jardin",
     categoryId: "figuras-a-mano",

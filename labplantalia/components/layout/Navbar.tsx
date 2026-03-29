@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NavbarCart } from "@/components/layout/NavbarCart";
 
 const navLinks = [
   { href: "#categorias", label: "Categorías" },
@@ -34,6 +35,13 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/login"
+            className="hidden text-sm font-medium text-muted transition-colors hover:text-primary sm:inline"
+          >
+            Iniciar sesión
+          </Link>
+          <NavbarCart />
           <details className="relative md:hidden">
             <summary className="cursor-pointer list-none rounded-full border border-border-subtle px-3 py-2 text-sm font-medium text-primary">
               Menú
@@ -48,6 +56,12 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                href="/login"
+                className="block border-t border-border-subtle px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-background"
+              >
+                Iniciar sesión
+              </Link>
             </div>
           </details>
 
