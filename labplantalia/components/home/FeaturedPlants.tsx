@@ -1,7 +1,12 @@
+"use client";
+
 import { ProductCard } from "@/components/products/ProductCard";
 import { featuredProducts } from "@/lib/data/home-mock";
+import { useCart } from "@/context/cart.context";
 
 export function FeaturedPlants() {
+  const { addItem } = useCart();
+
   return (
     <section
       id="destacados"
@@ -23,7 +28,11 @@ export function FeaturedPlants() {
         </div>
         <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              onAddToCart={(id) => addItem(id, 1)}
+            />
           ))}
         </div>
       </div>

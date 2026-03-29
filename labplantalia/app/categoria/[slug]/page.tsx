@@ -3,13 +3,17 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
-import { CatalogProductCard } from "@/components/catalog/CatalogProductCard";
+import { CategoriaCatalogClient } from "@/components/catalog/CategoriaCatalogClient";
 import {
   getCategoryBySlug,
-  getProductsByCategorySlug,
   isValidCategorySlug,
 } from "@/lib/data/catalog-products-mock";
 import { categories } from "@/lib/data/home-mock";
+import { fetchCategoryCatalogProducts } from "@/lib/server/fetch-category-products";
+import type { CatalogProduct } from "@/lib/types/catalog-product";
+
+/** Catálogo desde API; evita fallar el build si el API no está levantado. */
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -37,10 +41,18 @@ export default async function CategoriaPage({ params }: PageProps) {
   }
 
   const category = getCategoryBySlug(slug);
-  const products = getProductsByCategorySlug(slug);
 
   if (!category) {
     notFound();
+  }
+
+  let products: CatalogProduct[] = [];
+  let catalogError: string | null = null;
+  try {
+    products = await fetchCategoryCatalogProducts(slug);
+  } catch (e) {
+    catalogError =
+      e instanceof Error ? e.message : "No se pudo cargar el catálogo.";
   }
 
   return (
@@ -66,18 +78,20 @@ export default async function CategoriaPage({ params }: PageProps) {
               {category.name}
             </h1>
             <p className="mt-3 text-muted">
-              Selección del catálogo. Próximamente sincronizado con disponibilidad
-              en tiempo real.
+              Precios y disponibilidad según stock del vivero.
             </p>
           </header>
 
-          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-            {products.map((product) => (
-              <li key={product.id} className="h-full">
-                <CatalogProductCard product={product} />
-              </li>
-            ))}
-          </ul>
+          {catalogError ? (
+            <p
+              className="rounded-2xl border border-border-subtle bg-background px-4 py-3 text-sm text-muted"
+              role="alert"
+            >
+              {catalogError}
+            </p>
+          ) : null}
+
+          <CategoriaCatalogClient products={products} />
         </div>
       </main>
       <Footer />
