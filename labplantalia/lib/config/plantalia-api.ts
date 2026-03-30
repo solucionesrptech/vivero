@@ -24,8 +24,10 @@ export function getPlantaliaApiBaseUrl(): string {
 
   if (candidate.length > 0 && process.env.NODE_ENV === "production") {
     throw new Error(
-      "NEXT_PUBLIC_PLANTALIA_API_URL (o NEXT_PUBLIC_API_URL) debe ser una URL absoluta con http:// o https://, " +
-        "por ejemplo https://tu-servicio.onrender.com — no uses el nombre de la variable como valor.",
+      "La URL del API en producción no es válida. En Vercel: Settings → Environment Variables, " +
+        "edita NEXT_PUBLIC_PLANTALIA_API_URL (o NEXT_PUBLIC_API_URL) y pon la URL pública del backend, " +
+        "por ejemplo https://tu-servicio.onrender.com (con https://). No pongas el texto NEXT_PUBLIC_… como valor; " +
+        "vuelve a desplegar tras guardar.",
     );
   }
 
