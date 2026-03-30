@@ -6,9 +6,11 @@ import {
   InternalServerErrorException,
   Logger,
   Post,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AdminJwtConfigError } from './admin-jwt-secret.util';
 import { AdminAuthDomainError } from './admin-auth.domain-error';
 import { AdminAuthFacade } from './admin-auth.facade';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -31,6 +33,9 @@ export class AdminAuthController {
     } catch (e) {
       if (e instanceof AdminAuthDomainError) {
         throw new UnauthorizedException(e.message);
+      }
+      if (e instanceof AdminJwtConfigError) {
+        throw new ServiceUnavailableException(e.message);
       }
       const msg = e instanceof Error ? e.message : String(e);
       this.logger.error(`Login admin falló: ${msg}`, e instanceof Error ? e.stack : undefined);
