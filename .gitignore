@@ -1,1 +1,11 @@
 .vercel
+node_modules
+dist
+.env
+*.log
+*.tsbuildinfo
+.prisma
+lab-plantalia-api/dist
+lab-plantalia-api/node_modules
+labplantalia/.next
+labplantalia/node_modules
