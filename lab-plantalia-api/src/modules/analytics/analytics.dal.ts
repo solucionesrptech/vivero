@@ -9,6 +9,8 @@ export type TopProductsDalFilter = {
   dateFrom?: Date;
   /** V2: acotar por fecha de la orden (inclusive). */
   dateTo?: Date;
+  /** Solo líneas de productos activos (p. ej. destacados por ventas). */
+  onlyActiveProducts?: boolean;
 };
 
 @Injectable()
@@ -37,8 +39,15 @@ export class AnalyticsDal {
      * Evita fallos de runtime con `groupBy` + filtro por relación en Prisma 7 + adapter pg
      * en algunos hosts (p. ej. 500 sin mensaje claro en logs).
      */
+    const itemWhere: Prisma.OrderItemWhereInput = {
+      order: orderWhere,
+      ...(filter.onlyActiveProducts
+        ? { product: { isActive: true } }
+        : {}),
+    };
+
     const lines = await this.prisma.orderItem.findMany({
-      where: { order: orderWhere },
+      where: itemWhere,
       select: {
         productId: true,
         quantity: true,

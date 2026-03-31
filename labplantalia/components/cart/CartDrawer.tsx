@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CartList } from "@/components/cart/CartList";
 import { PaymentSuccessModal } from "@/components/cart/PaymentSuccessModal";
+import { DeliveryEstimateNotice } from "@/components/delivery/DeliveryEstimateNotice";
 import type { CartItemApi } from "@/lib/types/cart-api";
 
 export type CartDrawerProps = {
@@ -98,6 +99,7 @@ export function CartDrawer({
         </div>
         {hasItems ? (
           <footer className="shrink-0 border-t border-border-subtle bg-surface px-4 py-4">
+            <DeliveryEstimateNotice className="mb-3" />
             <button
               type="button"
               disabled={payDisabled}

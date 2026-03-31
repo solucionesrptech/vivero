@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { DeliveryEstimateNotice } from "@/components/delivery/DeliveryEstimateNotice";
 import type { FeaturedProduct } from "@/lib/data/home-mock";
 
 type ProductCardProps = {
@@ -48,6 +49,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         <p className="mt-auto pt-2 text-sm font-medium text-primary">
           {product.priceLabel}
         </p>
+        <DeliveryEstimateNotice variant="short" className="pt-1" />
         {onAddToCart ? (
           <button
             type="button"
