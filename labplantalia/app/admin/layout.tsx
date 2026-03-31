@@ -18,7 +18,19 @@ export default function AdminLayout({
             >
               Administración
             </Link>
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+              <Link
+                href="/admin"
+                className="text-muted transition-colors hover:text-primary"
+              >
+                Stock
+              </Link>
+              <Link
+                href="/admin/analytics"
+                className="text-muted transition-colors hover:text-primary"
+              >
+                Analytics
+              </Link>
               <Link href="/" className="text-muted transition-colors hover:text-primary">
                 Ver sitio
               </Link>

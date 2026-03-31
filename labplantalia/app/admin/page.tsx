@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ADMIN_TOKEN_STORAGE_KEY } from "@/lib/admin/token-storage";
 import type { AdminProductRow } from "@/lib/types/admin-api";
@@ -51,6 +52,19 @@ export default function AdminDashboardPage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+      <nav className="mb-6 text-sm text-muted" aria-label="Secciones de administración">
+        <span className="font-medium text-foreground">Stock de productos</span>
+        <span className="mx-2 text-border-subtle" aria-hidden>
+          /
+        </span>
+        <Link
+          href="/admin/analytics"
+          className="text-primary underline-offset-4 transition-colors hover:text-primary hover:underline"
+        >
+          Analytics
+        </Link>
+      </nav>
+
       <h1 className="font-display text-2xl text-foreground">Stock de productos</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted">
         Ajustes inmediatos en inventario. Los cambios se reflejan en el catálogo y en el
