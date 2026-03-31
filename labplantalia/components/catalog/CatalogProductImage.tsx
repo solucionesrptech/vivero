@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { isSafeForNextImage } from "@/lib/isSafeForNextImage";
+
 type CatalogProductImageProps = {
   src: string;
   alt: string;
@@ -8,19 +10,6 @@ type CatalogProductImageProps = {
   className?: string;
   priority?: boolean;
 };
-
-/** Evita pasar a `next/image` un src vacío o un host no declarado en `next.config`. */
-function isSafeForNextImage(trimmed: string): boolean {
-  if (trimmed.startsWith("/")) {
-    return true;
-  }
-  try {
-    const u = new URL(trimmed);
-    return u.protocol === "https:" && u.hostname === "images.unsplash.com";
-  } catch {
-    return false;
-  }
-}
 
 export function CatalogProductImage({
   src,
