@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Get,
   HttpCode,
@@ -7,10 +9,12 @@ import {
   NotFoundException,
   Param,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -19,7 +23,9 @@ import { AdminJwtGuard } from './admin-jwt.guard';
 import { AdminProductDomainError } from './admin-product.domain-error';
 import { AdminProductFacade } from './admin-product.facade';
 import { AdjustStockDto } from './dto/adjust-stock.dto';
+import { AdminProductCreatedDto } from './dto/admin-product-created.dto';
 import { AdminProductRowDto } from './dto/admin-product-row.dto';
+import { CreateAdminProductDto } from './dto/create-admin-product.dto';
 
 @ApiTags('admin-products')
 @ApiBearerAuth('admin-jwt')
@@ -33,6 +39,26 @@ export class AdminProductController {
   @ApiOkResponse({ type: AdminProductRowDto, isArray: true })
   list(): Promise<AdminProductRowDto[]> {
     return this.facade.list();
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Crear producto (catálogo y tienda)' })
+  @ApiCreatedResponse({ type: AdminProductCreatedDto })
+  async create(@Body() dto: CreateAdminProductDto): Promise<AdminProductCreatedDto> {
+    try {
+      return await this.facade.create(dto);
+    } catch (e) {
+      if (e instanceof AdminProductDomainError) {
+        if (e.code === 'DUPLICATE_SLUG') {
+          throw new ConflictException(e.message);
+        }
+        if (e.code === 'INVALID_CATEGORY_SLUG') {
+          throw new BadRequestException(e.message);
+        }
+      }
+      throw e;
+    }
   }
 
   @Patch(':productId/stock')

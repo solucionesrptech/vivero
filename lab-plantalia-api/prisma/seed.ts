@@ -27,6 +27,8 @@ const catalog: CatalogSeedRow[] = JSON.parse(
 async function main(): Promise<void> {
   await prisma.cartItem.deleteMany();
   await prisma.cart.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
   await prisma.product.deleteMany();
 
   const demoEmail = 'user@example.com';
@@ -64,6 +66,43 @@ async function main(): Promise<void> {
         imageAlt: p.imageAlt,
         stock: p.stock,
       },
+    });
+  }
+
+  const sampleA = catalog[0];
+  const sampleB = catalog[1];
+  if (sampleA && sampleB) {
+    const lineA = sampleA.price;
+    const lineB = sampleB.price * 2;
+    await prisma.order.create({
+      data: {
+        status: 'CONFIRMED',
+        total: lineA + lineB,
+        items: {
+          create: [
+            {
+              productId: sampleA.id,
+              quantity: 1,
+              unitPrice: sampleA.price,
+              lineSubtotal: lineA,
+            },
+            {
+              productId: sampleB.id,
+              quantity: 2,
+              unitPrice: sampleB.price,
+              lineSubtotal: lineB,
+            },
+          ],
+        },
+      },
+    });
+    await prisma.product.update({
+      where: { id: sampleA.id },
+      data: { stock: { decrement: 1 } },
+    });
+    await prisma.product.update({
+      where: { id: sampleB.id },
+      data: { stock: { decrement: 2 } },
     });
   }
 }

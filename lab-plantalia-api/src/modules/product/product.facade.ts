@@ -22,4 +22,20 @@ export class ProductFacade {
       stock: r.stock,
     }));
   }
+
+  async listFeatured(limit: number): Promise<ProductResponseDto[]> {
+    const rows = await this.bll.listFeaturedActive(limit);
+    return rows.map((r) => ({
+      id: r.id,
+      slug: r.slug,
+      categoryId: r.categoryId,
+      name: r.name,
+      shortDescription: r.shortDescription,
+      description: r.description,
+      price: r.price,
+      imageSrc: r.imageSrc,
+      imageAlt: r.imageAlt,
+      stock: r.stock,
+    }));
+  }
 }

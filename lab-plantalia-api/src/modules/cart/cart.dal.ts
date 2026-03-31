@@ -215,6 +215,22 @@ export class CartDal {
         }
       }
 
+      const orderTotal = items.reduce((sum, i) => sum + i.lineSubtotal, 0);
+      await tx.order.create({
+        data: {
+          status: 'CONFIRMED',
+          total: orderTotal,
+          items: {
+            create: items.map((i) => ({
+              productId: i.productId,
+              quantity: i.quantity,
+              unitPrice: i.unitPrice,
+              lineSubtotal: i.lineSubtotal,
+            })),
+          },
+        },
+      });
+
       await tx.cartItem.deleteMany({ where: { cartId } });
       await tx.cart.update({
         where: { id: cartId },

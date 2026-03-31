@@ -9,16 +9,22 @@ type CatalogProductImageProps = {
   priority?: boolean;
 };
 
-/**
- * Evita pasar a `next/image` un src vacío o un host no declarado en `next.config` (error en runtime).
- */
-function isSafeForNextImage(trimmed: string): boolean {
+function isLocalOrUnsplash(trimmed: string): boolean {
   if (trimmed.startsWith("/")) {
     return true;
   }
   try {
     const u = new URL(trimmed);
     return u.protocol === "https:" && u.hostname === "images.unsplash.com";
+  } catch {
+    return false;
+  }
+}
+
+function isRemoteHttpUrl(trimmed: string): boolean {
+  try {
+    const u = new URL(trimmed);
+    return u.protocol === "https:" || u.protocol === "http:";
   } catch {
     return false;
   }

@@ -13,4 +13,10 @@ export class ProductBll {
     }
     return this.dal.findByCategorySlug(trimmed);
   }
+
+  async listFeaturedActive(limit: number): Promise<ProductCatalogRow[]> {
+    const n = Number.isFinite(limit) ? Math.floor(limit) : 6;
+    const safe = Math.min(Math.max(n, 1), 24);
+    return this.dal.findFeaturedActive(safe);
+  }
 }
