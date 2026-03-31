@@ -9,22 +9,14 @@ type CatalogProductImageProps = {
   priority?: boolean;
 };
 
-function isLocalOrUnsplash(trimmed: string): boolean {
+/** Evita pasar a `next/image` un src vacío o un host no declarado en `next.config`. */
+function isSafeForNextImage(trimmed: string): boolean {
   if (trimmed.startsWith("/")) {
     return true;
   }
   try {
     const u = new URL(trimmed);
     return u.protocol === "https:" && u.hostname === "images.unsplash.com";
-  } catch {
-    return false;
-  }
-}
-
-function isRemoteHttpUrl(trimmed: string): boolean {
-  try {
-    const u = new URL(trimmed);
-    return u.protocol === "https:" || u.protocol === "http:";
   } catch {
     return false;
   }
@@ -40,7 +32,7 @@ export function CatalogProductImage({
 }: CatalogProductImageProps) {
   const trimmed = (src ?? "").trim();
   const label = alt.trim() || "Sin imagen de producto";
-  const useNext = trimmed.length > 0 && isLocalOrUnsplash(trimmed);
+  const useNext = trimmed.length > 0 && isSafeForNextImage(trimmed);
 
   if (!useNext) {
     const position = fill ? "absolute inset-0" : "";
