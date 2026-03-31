@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
+
 import { PrismaService } from '../../prisma/prisma.service';
 import { CartCheckoutDalError } from './cart.checkout-dal-error';
 import type {
@@ -172,7 +174,7 @@ export class CartDal {
    * descuenta inventario, vacía líneas y pone total en 0.
    */
   async checkoutCartTransactional(cartId: string): Promise<CartWithItemsRow> {
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const cart = await tx.cart.findUnique({
         where: { id: cartId },
         select: { id: true, total: true },
