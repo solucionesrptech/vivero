@@ -5,6 +5,7 @@ import type { CatalogProduct } from "@/lib/types/catalog-product";
 import type { CartLineDraft } from "@/lib/types/cart-selection";
 import { AvailabilityBadge } from "@/components/catalog/AvailabilityBadge";
 import { CatalogProductImage } from "@/components/catalog/CatalogProductImage";
+import { DeliveryEstimateNotice } from "@/components/delivery/DeliveryEstimateNotice";
 
 type ProductSelectionModalProps = {
   product: CatalogProduct;
@@ -121,6 +122,7 @@ export function ProductSelectionModal({
               <p className="mt-2 text-lg font-medium text-primary">
                 {product.priceLabel}
               </p>
+              <DeliveryEstimateNotice className="mt-2" />
               <div className="mt-3 flex items-center gap-2">
                 <span className="text-xs font-medium text-muted">Estado</span>
                 <AvailabilityBadge isAvailable={product.isAvailable} />

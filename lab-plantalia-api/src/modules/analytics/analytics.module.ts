@@ -8,5 +8,6 @@ import { AnalyticsFacade } from './analytics.facade';
 @Module({
   controllers: [AnalyticsController],
   providers: [AnalyticsDal, AnalyticsBll, AnalyticsFacade, AdminJwtGuard],
+  exports: [AnalyticsDal],
 })
 export class AnalyticsModule {}

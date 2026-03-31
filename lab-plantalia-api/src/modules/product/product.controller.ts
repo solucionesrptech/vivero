@@ -12,7 +12,8 @@ export class ProductController {
 
   @Get('featured')
   @ApiOperation({
-    summary: 'Productos activos destacados (p. ej. home), más recientes primero',
+    summary:
+      'Productos activos destacados (p. ej. home): prioriza unidades vendidas en los últimos 7 días (pedidos confirmados); completa con los más recientes si faltan cupos',
   })
   @ApiOkResponse({ type: ProductResponseDto, isArray: true })
   listFeatured(

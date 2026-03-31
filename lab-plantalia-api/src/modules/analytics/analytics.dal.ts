@@ -9,6 +9,8 @@ export type TopProductsDalFilter = {
   dateFrom?: Date;
   /** V2: acotar por fecha de la orden (inclusive). */
   dateTo?: Date;
+  /** Solo líneas de productos activos (p. ej. destacados por ventas). */
+  onlyActiveProducts?: boolean;
 };
 
 @Injectable()
@@ -32,30 +34,62 @@ export class AnalyticsDal {
       }
     }
 
-    const grouped = await this.prisma.orderItem.groupBy({
-      by: ['productId'],
-      where: { order: orderWhere },
-      _sum: { quantity: true, lineSubtotal: true },
-      orderBy: { _sum: { quantity: 'desc' } },
-      take: limit,
+    /**
+     * Agregación en memoria (equivalente a groupBy + top N por cantidad).
+     * Evita fallos de runtime con `groupBy` + filtro por relación en Prisma 7 + adapter pg
+     * en algunos hosts (p. ej. 500 sin mensaje claro en logs).
+     */
+    const itemWhere: Prisma.OrderItemWhereInput = {
+      order: orderWhere,
+      ...(filter.onlyActiveProducts
+        ? { product: { isActive: true } }
+        : {}),
+    };
+
+    const lines = await this.prisma.orderItem.findMany({
+      where: itemWhere,
+      select: {
+        productId: true,
+        quantity: true,
+        lineSubtotal: true,
+      },
     });
 
-    if (grouped.length === 0) {
+    const sumsByProduct = new Map<
+      string,
+      { totalQuantitySold: number; totalRevenue: number }
+    >();
+    for (const row of lines) {
+      const cur = sumsByProduct.get(row.productId) ?? {
+        totalQuantitySold: 0,
+        totalRevenue: 0,
+      };
+      cur.totalQuantitySold += row.quantity;
+      cur.totalRevenue += row.lineSubtotal;
+      sumsByProduct.set(row.productId, cur);
+    }
+
+    const ranked = [...sumsByProduct.entries()].sort(
+      (a, b) => b[1].totalQuantitySold - a[1].totalQuantitySold,
+    );
+    const top = ranked.slice(0, limit);
+
+    if (top.length === 0) {
       return [];
     }
 
-    const ids = grouped.map((g) => g.productId);
+    const ids = top.map(([productId]) => productId);
     const products = await this.prisma.product.findMany({
       where: { id: { in: ids } },
       select: { id: true, name: true },
     });
     const nameById = new Map(products.map((p) => [p.id, p.name]));
 
-    return grouped.map((g) => ({
-      productId: g.productId,
-      productName: nameById.get(g.productId) ?? 'Producto',
-      totalQuantitySold: g._sum.quantity ?? 0,
-      totalRevenue: g._sum.lineSubtotal ?? 0,
+    return top.map(([productId, sums]) => ({
+      productId,
+      productName: nameById.get(productId) ?? 'Producto',
+      totalQuantitySold: sums.totalQuantitySold,
+      totalRevenue: sums.totalRevenue,
     }));
   }
 }

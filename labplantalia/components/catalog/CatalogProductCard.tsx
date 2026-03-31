@@ -6,6 +6,7 @@ import type { CartLineDraft } from "@/lib/types/cart-selection";
 import { AvailabilityBadge } from "@/components/catalog/AvailabilityBadge";
 import { CatalogProductImage } from "@/components/catalog/CatalogProductImage";
 import { ProductSelectionModal } from "@/components/catalog/ProductSelectionModal";
+import { DeliveryEstimateNotice } from "@/components/delivery/DeliveryEstimateNotice";
 
 type CatalogProductCardProps = {
   product: CatalogProduct;
@@ -56,6 +57,7 @@ export function CatalogProductCard({ product, onAddToCart }: CatalogProductCardP
                 "No disponible"
               )}
             </p>
+            <DeliveryEstimateNotice variant="short" className="mt-1" />
             <button
               type="button"
               disabled={!canInteract}
