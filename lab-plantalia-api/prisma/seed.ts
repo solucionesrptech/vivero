@@ -1,10 +1,15 @@
+import '../src/load-env';
+
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+import { createPgAdapterFromEnv } from '../src/prisma/pg-adapter';
+
+const { pool, adapter } = createPgAdapterFromEnv();
+const prisma = new PrismaClient({ adapter });
 
 type CatalogSeedRow = {
   id: string;
@@ -110,9 +115,11 @@ async function main(): Promise<void> {
 main()
   .then(async () => {
     await prisma.$disconnect();
+    await pool.end();
   })
   .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
+    await pool.end();
     process.exit(1);
   });
