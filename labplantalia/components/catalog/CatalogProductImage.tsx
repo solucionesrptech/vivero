@@ -40,7 +40,7 @@ export function CatalogProductImage({
 }: CatalogProductImageProps) {
   const trimmed = (src ?? "").trim();
   const label = alt.trim() || "Sin imagen de producto";
-  const useNext = trimmed.length > 0 && isSafeForNextImage(trimmed);
+  const useNext = trimmed.length > 0 && isLocalOrUnsplash(trimmed);
 
   if (!useNext) {
     const position = fill ? "absolute inset-0" : "";

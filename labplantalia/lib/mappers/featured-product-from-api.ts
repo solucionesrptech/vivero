@@ -1,4 +1,4 @@
-import type { FeaturedProduct } from "@/lib/data/home-mock";
+import type { CategoryId, FeaturedProduct } from "@/lib/data/home-mock";
 import { categories } from "@/lib/data/home-mock";
 import type { ProductApiDto } from "@/lib/types/product-api";
 import { isValidCategorySlug } from "@/lib/data/catalog-products-mock";
@@ -17,7 +17,7 @@ export function mapProductApiToFeaturedProduct(dto: ProductApiDto): FeaturedProd
     id: dto.id,
     name: dto.name,
     slug: dto.slug,
-    categoryId: dto.categoryId,
+    categoryId: dto.categoryId as CategoryId,
     categoryName,
     priceLabel: formatPriceLabel(dto.price),
     imageSrc: dto.imageSrc,
