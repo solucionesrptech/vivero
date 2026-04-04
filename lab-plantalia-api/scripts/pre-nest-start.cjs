@@ -17,8 +17,10 @@ if (!fs.existsSync(distDir) && fs.existsSync(stamp)) {
 }
 
 if (!fs.existsSync(mainJs)) {
-  console.log("lab-plantalia-api: generando dist (nest build)…");
-  execSync("npx nest build", {
+  console.log(
+    "lab-plantalia-api: prisma generate + nest build (dist ausente)…",
+  );
+  execSync("npx prisma generate && npx nest build", {
     cwd: root,
     stdio: "inherit",
     env: process.env,
