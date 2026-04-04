@@ -4,6 +4,7 @@ import { NavbarCart } from "@/components/layout/NavbarCart";
 const navLinks = [
   { href: "#categorias", label: "Categorías" },
   { href: "#destacados", label: "Destacados" },
+  { href: "/consulta-pedido", label: "Mi pedido" },
   { href: "#nosotros", label: "Nosotros" },
   { href: "#contacto", label: "Contacto" },
 ];

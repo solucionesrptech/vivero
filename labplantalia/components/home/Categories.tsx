@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { categories } from "@/lib/data/home-mock";
+import { categories } from "@/lib/constants/plantalia-categories";
 
 export function Categories() {
   return (

@@ -45,6 +45,15 @@ async function main(): Promise<void> {
     update: { passwordHash },
   });
 
+  const sharedAdminEmail = 'plantalia.lab@gmail.com';
+  const sharedAdminPassword = 'plantalia2027';
+  const sharedAdminHash = bcrypt.hashSync(sharedAdminPassword, 10);
+  await prisma.adminUser.upsert({
+    where: { email: sharedAdminEmail },
+    create: { email: sharedAdminEmail, passwordHash: sharedAdminHash },
+    update: { passwordHash: sharedAdminHash },
+  });
+
   for (const p of catalog) {
     await prisma.product.upsert({
       where: { id: p.id },

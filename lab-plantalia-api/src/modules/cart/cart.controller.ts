@@ -25,6 +25,7 @@ import { AddCartItemDto } from './dto/add-cart-item.dto';
 import { CartResponseDto } from './dto/cart-response.dto';
 import { CartIdQueryDto } from './dto/cart-id-query.dto';
 import { CheckoutCartDto } from './dto/checkout-cart.dto';
+import { CheckoutResponseDto } from './dto/checkout-response.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 @ApiTags('cart')
@@ -46,15 +47,15 @@ export class CartController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
-      'Checkout V1 (pago simulado): valida stock, descuenta inventario y vacía el carrito',
+      'Checkout: datos de entrega, valida stock, crea pedido y vacía el carrito',
   })
-  @ApiOkResponse({ type: CartResponseDto })
+  @ApiOkResponse({ type: CheckoutResponseDto })
   @ApiBadRequestResponse({
-    description: 'Stock insuficiente, carrito vacío o datos inválidos',
+    description: 'Stock insuficiente, carrito vacío o datos de checkout inválidos',
   })
   @ApiNotFoundResponse({ description: 'Carrito no encontrado' })
-  checkout(@Body() dto: CheckoutCartDto): Promise<CartResponseDto> {
-    return this.facade.checkout(dto.cartId);
+  checkout(@Body() dto: CheckoutCartDto): Promise<CheckoutResponseDto> {
+    return this.facade.checkout(dto);
   }
 
   @Get('current')

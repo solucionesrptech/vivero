@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderStatus } from '@prisma/client';
+import { ORDER_STATUSES_COUNTED_AS_SALES } from '../../domain/order-sales-statuses';
 import { AnalyticsDal } from '../analytics/analytics.dal';
 import { ProductDal } from './product.dal';
 import type { ProductCatalogRow } from './product.types';
@@ -29,7 +29,7 @@ export class ProductBll {
     const dateFrom = new Date(dateTo.getTime() - FEATURED_SALES_WINDOW_MS);
 
     const topSold = await this.analyticsDal.findTopProductsByQuantitySold(safe, {
-      orderStatuses: [OrderStatus.CONFIRMED],
+      orderStatuses: ORDER_STATUSES_COUNTED_AS_SALES,
       dateFrom,
       dateTo,
       onlyActiveProducts: true,

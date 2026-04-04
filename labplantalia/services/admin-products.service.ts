@@ -1,5 +1,9 @@
 import { getPlantaliaApiBaseUrl } from "@/lib/config/plantalia-api";
-import type { AdminProductRow } from "@/lib/types/admin-api";
+import type {
+  AdminProductCreated,
+  AdminProductRow,
+  CreateAdminProductPayload,
+} from "@/lib/types/admin-api";
 
 async function readErrorMessage(res: Response): Promise<string> {
   try {
@@ -54,4 +58,22 @@ export async function patchAdminProductStock(
     throw new Error(await readErrorMessage(res));
   }
   return res.json() as Promise<AdminProductRow>;
+}
+
+export async function postAdminProduct(
+  token: string,
+  body: CreateAdminProductPayload,
+): Promise<AdminProductCreated> {
+  const res = await fetch(`${getPlantaliaApiBaseUrl()}/admin/products`, {
+    method: "POST",
+    headers: {
+      ...adminHeaders(token),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(await readErrorMessage(res));
+  }
+  return res.json() as Promise<AdminProductCreated>;
 }

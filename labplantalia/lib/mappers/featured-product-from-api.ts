@@ -1,7 +1,7 @@
-import type { CategoryId, FeaturedProduct } from "@/lib/data/home-mock";
-import { categories } from "@/lib/data/home-mock";
+import type { CategoryId } from "@/lib/constants/plantalia-categories";
+import { categories, isValidCategorySlug } from "@/lib/constants/plantalia-categories";
+import type { FeaturedProduct } from "@/lib/data/home-mock";
 import type { ProductApiDto } from "@/lib/types/product-api";
-import { isValidCategorySlug } from "@/lib/data/catalog-products-mock";
 
 function formatPriceLabel(clp: number): string {
   return `$${clp.toLocaleString("es-CL")}`;

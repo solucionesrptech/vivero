@@ -1,5 +1,6 @@
 import { getPlantaliaApiBaseUrl } from "@/lib/config/plantalia-api";
 import type { CartApi } from "@/lib/types/cart-api";
+import type { CheckoutPayload, CheckoutResponseApi } from "@/lib/types/checkout-api";
 
 const STORAGE_KEY = "plantalia-cart-id";
 
@@ -112,19 +113,31 @@ export async function patchCartItemQuantity(
   return res.json() as Promise<CartApi>;
 }
 
-/** Checkout V1: descuenta stock en el servidor y devuelve el carrito vacío. */
-export async function postCheckoutCart(cartId: string): Promise<CartApi> {
+/** Checkout: crea pedido con datos de entrega y devuelve carrito vacío + orden. */
+export async function postCheckoutCart(
+  payload: CheckoutPayload,
+): Promise<CheckoutResponseApi> {
+  const body: Record<string, unknown> = {
+    cartId: payload.cartId,
+    deliveryType: payload.deliveryType,
+    customerName: payload.customerName,
+    customerPhone: payload.customerPhone,
+  };
+  if (payload.deliveryType === "DELIVERY" && payload.deliveryAddress) {
+    body.deliveryAddress = payload.deliveryAddress;
+  }
+
   const res = await cartFetch(cartUrl("/cart/checkout"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ cartId }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
     throw new Error(await readErrorMessage(res));
   }
 
-  return res.json() as Promise<CartApi>;
+  return res.json() as Promise<CheckoutResponseApi>;
 }
 
 export async function deleteCartItem(

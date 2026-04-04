@@ -1,13 +1,24 @@
 "use client";
 
 import { useEffect, useId } from "react";
+import {
+  SHIPPING_FREIGHT_NOTE,
+  SHIPPING_CARRIER_NAME,
+  SHIPPING_CHECKOUT_TOTAL_NOTE,
+} from "@/lib/constants/shipping-policy";
+import type { CheckoutOrderApi } from "@/lib/types/checkout-api";
 
 type PaymentSuccessModalProps = {
   open: boolean;
+  order: CheckoutOrderApi | null;
   onClose: () => void;
 };
 
-export function PaymentSuccessModal({ open, onClose }: PaymentSuccessModalProps) {
+export function PaymentSuccessModal({
+  open,
+  order,
+  onClose,
+}: PaymentSuccessModalProps) {
   const titleId = useId();
 
   useEffect(() => {
@@ -19,7 +30,10 @@ export function PaymentSuccessModal({ open, onClose }: PaymentSuccessModalProps)
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !order) return null;
+
+  const tipo =
+    order.deliveryType === "DELIVERY" ? "Delivery" : "Retiro en tienda";
 
   return (
     <div
@@ -45,12 +59,38 @@ export function PaymentSuccessModal({ open, onClose }: PaymentSuccessModalProps)
           Pago verificado
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
-          Gracias por su compra
+          Gracias por su compra. Tu pedido quedó registrado con el código{" "}
+          <span className="font-semibold text-foreground">
+            {order.publicCode}
+          </span>
+          . Conserva esa referencia para cualquier consulta.
         </p>
+        {order.deliveryType === "DELIVERY" ? (
+          <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">
+            Despacho por {SHIPPING_CARRIER_NAME}. {SHIPPING_FREIGHT_NOTE}{" "}
+            {SHIPPING_CHECKOUT_TOTAL_NOTE}
+          </p>
+        ) : null}
+        <dl className="mt-4 space-y-2 rounded-xl border border-border-subtle bg-background px-4 py-3 text-sm">
+          <div className="flex justify-between gap-2">
+            <dt className="text-muted">Pedido</dt>
+            <dd className="font-semibold text-foreground">{order.publicCode}</dd>
+          </div>
+          <div className="flex justify-between gap-2">
+            <dt className="text-muted">Entrega</dt>
+            <dd className="text-foreground">{tipo}</dd>
+          </div>
+          <div className="flex justify-between gap-2">
+            <dt className="text-muted">Total productos</dt>
+            <dd className="font-semibold text-foreground">
+              ${order.total.toLocaleString("es-CL")} CLP
+            </dd>
+          </div>
+        </dl>
         <button
           type="button"
           onClick={onClose}
-          className="mt-8 w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-surface transition-opacity hover:opacity-90"
+          className="mt-6 w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-surface transition-opacity hover:opacity-90"
         >
           Cerrar
         </button>

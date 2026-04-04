@@ -5,10 +5,10 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { CategoriaCatalogClient } from "@/components/catalog/CategoriaCatalogClient";
 import {
+  categories,
   getCategoryBySlug,
   isValidCategorySlug,
-} from "@/lib/data/catalog-products-mock";
-import { categories } from "@/lib/data/home-mock";
+} from "@/lib/constants/plantalia-categories";
 import { fetchCategoryCatalogProducts } from "@/lib/server/fetch-category-products";
 import type { CatalogProduct } from "@/lib/types/catalog-product";
 

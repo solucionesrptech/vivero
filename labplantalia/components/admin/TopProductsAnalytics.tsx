@@ -19,7 +19,8 @@ export function TopProductsAnalytics({ rows, loading, error }: Props) {
       <div>
         <h2 className="font-display text-xl text-foreground">Productos más vendidos</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Basado en órdenes confirmadas (checkout completado). No incluye carritos abiertos.
+          Basado en pedidos que ya cuentan como venta (checkout y flujo operativo; excluye
+          cancelados). No incluye carritos abiertos.
         </p>
       </div>
 

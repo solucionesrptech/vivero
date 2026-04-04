@@ -10,8 +10,12 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { CartDrawer } from "@/components/cart/CartDrawer";
+import {
+  CartDrawer,
+  type CartCheckoutPayload,
+} from "@/components/cart/CartDrawer";
 import type { CartApi, CartItemApi } from "@/lib/types/cart-api";
+import type { CheckoutOrderApi } from "@/lib/types/checkout-api";
 import {
   addCartItem,
   clearStoredCartId,
@@ -38,8 +42,8 @@ type CartContextValue = {
   increaseLine: (item: CartItemApi) => Promise<void>;
   decreaseLine: (item: CartItemApi) => Promise<void>;
   removeLine: (item: CartItemApi) => Promise<void>;
-  /** Pago simulado: checkout en API y carrito vacío si tiene éxito. */
-  checkout: () => Promise<void>;
+  /** Checkout en API: devuelve la orden creada y deja el carrito vacío. */
+  checkout: (payload: CartCheckoutPayload) => Promise<CheckoutOrderApi>;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -178,27 +182,42 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [runLineMutation],
   );
 
-  const checkout = useCallback(async () => {
-    const id = readStoredCartId();
-    if (!id) {
-      setError("No hay carrito activo");
-      throw new Error("No hay carrito activo");
-    }
-    setIsSyncing(true);
-    setError(null);
-    try {
-      const next = await postCheckoutCart(id);
-      setCart(next);
-      setCartId(next.id);
-      writeStoredCartId(next.id);
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo completar el pago");
-      throw e;
-    } finally {
-      setIsSyncing(false);
-    }
-  }, [router]);
+  const checkout = useCallback(
+    async (payload: CartCheckoutPayload) => {
+      const id = readStoredCartId();
+      if (!id) {
+        setError("No hay carrito activo");
+        throw new Error("No hay carrito activo");
+      }
+      setIsSyncing(true);
+      setError(null);
+      try {
+        const res = await postCheckoutCart({
+          cartId: id,
+          deliveryType: payload.deliveryType,
+          customerName: payload.customerName,
+          customerPhone: payload.customerPhone,
+          deliveryAddress: payload.deliveryAddress,
+        });
+        setCart(res.cart);
+        setCartId(res.cart.id);
+        writeStoredCartId(res.cart.id);
+        router.refresh();
+        if (typeof sessionStorage !== "undefined") {
+          sessionStorage.setItem("plantalia-last-order-code", res.order.publicCode);
+        }
+        return res.order;
+      } catch (e) {
+        setError(
+          e instanceof Error ? e.message : "No se pudo completar el pago",
+        );
+        throw e;
+      } finally {
+        setIsSyncing(false);
+      }
+    },
+    [router],
+  );
 
   const itemCount = useMemo(
     () => cart?.items.reduce((acc, i) => acc + i.quantity, 0) ?? 0,

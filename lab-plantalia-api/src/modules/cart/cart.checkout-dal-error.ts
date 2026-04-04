@@ -2,7 +2,8 @@
 export type CartCheckoutDalErrorCode =
   | 'CART_NOT_FOUND'
   | 'CART_EMPTY'
-  | 'STOCK_INSUFFICIENT';
+  | 'STOCK_INSUFFICIENT'
+  | 'PUBLIC_CODE_GENERATION_FAILED';
 
 export class CartCheckoutDalError extends Error {
   constructor(
