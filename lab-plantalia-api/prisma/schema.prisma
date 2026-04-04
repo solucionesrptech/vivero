@@ -10,6 +10,16 @@ enum OrderStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  AWAITING_PREPARATION
+  READY_FOR_DELIVERY
+  READY_FOR_PICKUP
+  PICKED_UP
+  DELIVERED
+}
+
+enum DeliveryType {
+  DELIVERY
+  PICKUP
 }
 
 model Product {
@@ -31,13 +41,19 @@ model Product {
 }
 
 model Order {
-  id        String      @id @default(uuid())
-  createdAt DateTime    @default(now())
-  status    OrderStatus @default(CONFIRMED)
-  total     Int         @default(0)
-  items     OrderItem[]
+  id              String        @id @default(uuid())
+  createdAt       DateTime      @default(now())
+  status          OrderStatus   @default(AWAITING_PREPARATION)
+  total           Int           @default(0)
+  deliveryType    DeliveryType
+  customerName    String
+  customerPhone   String
+  deliveryAddress String?
+  publicCode      String        @unique
+  items           OrderItem[]
 
   @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {

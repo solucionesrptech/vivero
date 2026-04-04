@@ -6,11 +6,12 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "prebuild": "node scripts/pre-nest-start.cjs",
     "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
+    "start": "node scripts/pre-nest-start.cjs && nest start",
+    "start:dev": "node scripts/pre-nest-start.cjs && nest start --watch",
+    "start:debug": "node scripts/pre-nest-start.cjs && nest start --debug --watch",
     "start:prod": "node dist/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -20,7 +21,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "prisma:studio": "prisma studio --browser none",
+    "studio": "prisma studio --browser none",
+    "prisma:create-admin": "ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" prisma/create-admin-user.ts"
   },
   "overrides": {
     "path-to-regexp": "8.4.1",
@@ -34,15 +38,16 @@
     "@nestjs/swagger": "^11.2.6",
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
-    "pg": "^8.16.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.4",
     "dotenv": "^17.3.1",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.16.0",
     "prisma": "^7.6.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "twilio": "^5.13.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

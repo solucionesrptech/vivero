@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { DeliveryType } from '@prisma/client';
 import type { AddCartItemDto } from './dto/add-cart-item.dto';
+import type { CheckoutCartDto } from './dto/checkout-cart.dto';
 import type { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import {
   CartCheckoutDalError,
@@ -7,7 +9,11 @@ import {
 } from './cart.checkout-dal-error';
 import { CartDal } from './cart.dal';
 import { CartDomainError, type CartDomainErrorKind } from './cart.domain-error';
-import type { CartWithItemsRow } from './cart.types';
+import type {
+  CartWithItemsRow,
+  CheckoutOrderInput,
+  CheckoutOrderSnapshot,
+} from './cart.types';
 
 const CHECKOUT_DAL_TO_DOMAIN: Record<
   CartCheckoutDalErrorCode,
@@ -16,6 +22,7 @@ const CHECKOUT_DAL_TO_DOMAIN: Record<
   CART_NOT_FOUND: 'CART_NOT_FOUND',
   CART_EMPTY: 'CART_EMPTY',
   STOCK_INSUFFICIENT: 'STOCK_INSUFFICIENT',
+  PUBLIC_CODE_GENERATION_FAILED: 'CHECKOUT_FAILED',
 };
 
 @Injectable()
@@ -160,12 +167,53 @@ export class CartBll {
     return snapshot;
   }
 
+  private normalizeCheckout(dto: CheckoutCartDto): CheckoutOrderInput {
+    const name = dto.customerName.trim();
+    const phone = dto.customerPhone.replace(/\D/g, '');
+    if (name.length < 2) {
+      throw new CartDomainError(
+        'INVALID_CHECKOUT',
+        'Indica un nombre válido.',
+      );
+    }
+    if (phone.length < 8) {
+      throw new CartDomainError(
+        'INVALID_CHECKOUT',
+        'Indica un teléfono válido.',
+      );
+    }
+    if (dto.deliveryType === DeliveryType.DELIVERY) {
+      const addr = dto.deliveryAddress?.trim() ?? '';
+      if (addr.length < 5) {
+        throw new CartDomainError(
+          'INVALID_CHECKOUT',
+          'La dirección de envío es obligatoria para delivery.',
+        );
+      }
+      return {
+        deliveryType: DeliveryType.DELIVERY,
+        customerName: name,
+        customerPhone: phone,
+        deliveryAddress: addr,
+      };
+    }
+    return {
+      deliveryType: DeliveryType.PICKUP,
+      customerName: name,
+      customerPhone: phone,
+      deliveryAddress: null,
+    };
+  }
+
   /**
-   * Checkout V1: validación final de stock y descuento atómico en DAL; vacía el carrito.
+   * Checkout: validación de datos de entrega, stock y creación de pedido en transacción.
    */
-  async checkout(cartId: string): Promise<CartWithItemsRow> {
+  async checkout(
+    dto: CheckoutCartDto,
+  ): Promise<{ cart: CartWithItemsRow; order: CheckoutOrderSnapshot }> {
+    const payload = this.normalizeCheckout(dto);
     try {
-      return await this.dal.checkoutCartTransactional(cartId);
+      return await this.dal.checkoutCartTransactional(dto.cartId, payload);
     } catch (e) {
       if (e instanceof CartCheckoutDalError) {
         throw new CartDomainError(

@@ -63,6 +63,15 @@ export default function AdminDashboardPage() {
         >
           Analytics
         </Link>
+        <span className="mx-2 text-border-subtle" aria-hidden>
+          /
+        </span>
+        <Link
+          href="/admin/orders"
+          className="text-primary underline-offset-4 transition-colors hover:text-primary hover:underline"
+        >
+          Pedidos
+        </Link>
       </nav>
 
       <h1 className="font-display text-2xl text-foreground">Stock de productos</h1>

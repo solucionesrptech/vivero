@@ -1,5 +1,9 @@
+import {
+  categories,
+  getCategoryBySlug,
+  isValidCategorySlug,
+} from "@/lib/constants/plantalia-categories";
 import type { CatalogProduct } from "@/lib/types/catalog-product";
-import { categories, type CategoryCard } from "@/lib/data/home-mock";
 
 const u = (id: string, w: number) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
@@ -467,16 +471,9 @@ const CATALOG_PRODUCTS: CatalogProduct[] = [
   },
 ];
 
-export function getCategoryBySlug(slug: string): CategoryCard | undefined {
-  return categories.find((c) => c.slug === slug);
-}
-
 export function getProductsByCategorySlug(slug: string): CatalogProduct[] {
   const cat = getCategoryBySlug(slug);
   if (!cat) return [];
   return CATALOG_PRODUCTS.filter((p) => p.categoryId === cat.id);
 }
 
-export function isValidCategorySlug(slug: string): boolean {
-  return categories.some((c) => c.slug === slug);
-}

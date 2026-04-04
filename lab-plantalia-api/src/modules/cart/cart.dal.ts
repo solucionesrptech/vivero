@@ -1,13 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import type { Prisma } from '@prisma/client';
+import { Prisma, type DeliveryType } from '@prisma/client';
+import { randomInt } from 'node:crypto';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { CartCheckoutDalError } from './cart.checkout-dal-error';
 import type {
   CartItemRow,
   CartWithItemsRow,
+  CheckoutOrderInput,
+  CheckoutOrderSnapshot,
   ProductRow,
 } from './cart.types';
+
+const PUBLIC_CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function randomPublicCode(): string {
+  let s = 'P-';
+  for (let i = 0; i < 8; i++) {
+    s += PUBLIC_CODE_CHARS[randomInt(PUBLIC_CODE_CHARS.length)];
+  }
+  return s;
+}
 
 @Injectable()
 export class CartDal {
@@ -171,9 +184,14 @@ export class CartDal {
 
   /**
    * Checkout atómico: valida stock con lectura consistente en transacción,
-   * descuenta inventario, vacía líneas y pone total en 0.
+   * descuenta inventario, crea pedido con datos de entrega, vacía líneas y pone total en 0.
    */
-  async checkoutCartTransactional(cartId: string): Promise<CartWithItemsRow> {
+  async checkoutCartTransactional(
+    cartId: string,
+    orderInput: CheckoutOrderInput,
+  ): Promise<{ cart: CartWithItemsRow; order: CheckoutOrderSnapshot }> {
+    const deliveryType = orderInput.deliveryType;
+
     return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const cart = await tx.cart.findUnique({
         where: { id: cartId },
@@ -218,20 +236,69 @@ export class CartDal {
       }
 
       const orderTotal = items.reduce((sum, i) => sum + i.lineSubtotal, 0);
-      await tx.order.create({
-        data: {
-          status: 'CONFIRMED',
-          total: orderTotal,
-          items: {
-            create: items.map((i) => ({
-              productId: i.productId,
-              quantity: i.quantity,
-              unitPrice: i.unitPrice,
-              lineSubtotal: i.lineSubtotal,
-            })),
-          },
-        },
-      });
+
+      const lineCreates = items.map((i) => ({
+        productId: i.productId,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        lineSubtotal: i.lineSubtotal,
+      }));
+
+      let created: {
+        id: string;
+        publicCode: string;
+        status: string;
+        total: number;
+        deliveryType: DeliveryType;
+        customerName: string;
+        customerPhone: string;
+        deliveryAddress: string | null;
+        items: {
+          quantity: number;
+          lineSubtotal: number;
+          product: { name: string };
+        }[];
+      } | null = null;
+
+      for (let attempt = 0; attempt < 16; attempt++) {
+        const publicCode = randomPublicCode();
+        try {
+          created = await tx.order.create({
+            data: {
+              status: 'AWAITING_PREPARATION',
+              total: orderTotal,
+              deliveryType,
+              customerName: orderInput.customerName,
+              customerPhone: orderInput.customerPhone,
+              deliveryAddress: orderInput.deliveryAddress,
+              publicCode,
+              items: { create: lineCreates },
+            },
+            include: {
+              items: {
+                include: { product: { select: { name: true } } },
+                orderBy: { id: 'asc' },
+              },
+            },
+          });
+          break;
+        } catch (e) {
+          if (
+            e instanceof Prisma.PrismaClientKnownRequestError &&
+            e.code === 'P2002'
+          ) {
+            continue;
+          }
+          throw e;
+        }
+      }
+
+      if (!created) {
+        throw new CartCheckoutDalError(
+          'PUBLIC_CODE_GENERATION_FAILED',
+          'No se pudo generar un código de pedido único. Intenta de nuevo en unos segundos.',
+        );
+      }
 
       await tx.cartItem.deleteMany({ where: { cartId } });
       await tx.cart.update({
@@ -239,10 +306,29 @@ export class CartDal {
         data: { total: 0 },
       });
 
+      const order: CheckoutOrderSnapshot = {
+        id: created.id,
+        publicCode: created.publicCode,
+        status: created.status,
+        total: created.total,
+        deliveryType: created.deliveryType,
+        customerName: created.customerName,
+        customerPhone: created.customerPhone,
+        deliveryAddress: created.deliveryAddress,
+        lines: created.items.map((i) => ({
+          productName: i.product.name,
+          quantity: i.quantity,
+          lineSubtotal: i.lineSubtotal,
+        })),
+      };
+
       return {
-        id: cart.id,
-        total: 0,
-        items: [],
+        cart: {
+          id: cart.id,
+          total: 0,
+          items: [],
+        },
+        order,
       };
     });
   }

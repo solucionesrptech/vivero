@@ -1,5 +1,5 @@
-import type { CategoryId } from "@/lib/data/home-mock";
-import { isValidCategorySlug } from "@/lib/data/catalog-products-mock";
+import type { CategoryId } from "@/lib/constants/plantalia-categories";
+import { isValidCategorySlug } from "@/lib/constants/plantalia-categories";
 import type { CatalogProduct } from "@/lib/types/catalog-product";
 import type { ProductApiDto } from "@/lib/types/product-api";
 

@@ -1,4 +1,4 @@
-import type { CategoryId } from "@/lib/data/home-mock";
+import type { CategoryId } from "@/lib/constants/plantalia-categories";
 
 /**
  * Producto de catálogo (listo para mapear desde API).

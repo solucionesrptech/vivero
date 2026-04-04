@@ -26,10 +26,22 @@ export default function AdminLayout({
                 Stock
               </Link>
               <Link
+                href="/admin/products/new"
+                className="text-muted transition-colors hover:text-primary"
+              >
+                Nuevo producto
+              </Link>
+              <Link
                 href="/admin/analytics"
                 className="text-muted transition-colors hover:text-primary"
               >
                 Analytics
+              </Link>
+              <Link
+                href="/admin/orders"
+                className="text-muted transition-colors hover:text-primary"
+              >
+                Pedidos
               </Link>
               <Link href="/" className="text-muted transition-colors hover:text-primary">
                 Ver sitio

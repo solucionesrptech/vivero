@@ -8,7 +8,9 @@ export type CartDomainErrorKind =
   | 'CART_ITEM_NOT_FOUND'
   | 'INVALID_QUANTITY'
   | 'STOCK_INSUFFICIENT'
-  | 'CART_EMPTY';
+  | 'CART_EMPTY'
+  | 'INVALID_CHECKOUT'
+  | 'CHECKOUT_FAILED';
 
 /** Error lanzado por la BLL; mensajes en español, sin datos internos. */
 export class CartDomainError extends Error {

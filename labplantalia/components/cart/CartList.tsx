@@ -113,7 +113,7 @@ export function CartList({
       </ul>
       <div className="border-t border-border-subtle pt-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-foreground">Total</span>
+          <span className="font-medium text-foreground">Total productos</span>
           <span className="font-display text-lg text-primary tabular-nums">
             {formatClp(total)}
           </span>
