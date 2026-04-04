@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AdminJwtGuard } from '../admin/admin-jwt.guard';
-import { AnalyticsBll } from './analytics.bll';
-import { AnalyticsController } from './analytics.controller';
-import { AnalyticsDal } from './analytics.dal';
-import { AnalyticsFacade } from './analytics.facade';
+import { AdminModule } from '../admin/admin.module';
+import { AnalyticsBll } from './bll/analytics.bll';
+import { AnalyticsController } from './controller/analytics.controller';
+import { AnalyticsDal } from './dal/analytics.dal';
+import { AnalyticsFacade } from './facade/analytics.facade';
 
 @Module({
+  imports: [AdminModule],
   controllers: [AnalyticsController],
-  providers: [AnalyticsDal, AnalyticsBll, AnalyticsFacade, AdminJwtGuard],
-  exports: [AnalyticsDal],
+  providers: [AnalyticsDal, AnalyticsBll, AnalyticsFacade],
+  exports: [AnalyticsBll],
 })
 export class AnalyticsModule {}

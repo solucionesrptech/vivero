@@ -5,13 +5,20 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
-import { ADMIN_TOKEN_STORAGE_KEY } from "@/lib/admin/token-storage";
 import { adminLogin } from "@/services/admin-auth.service";
+
+function toSafeNextPath(raw: string | null): string {
+  if (!raw) return "/admin";
+  if (!raw.startsWith("/")) return "/admin";
+  if (raw.startsWith("//")) return "/admin";
+  if (!(raw === "/admin" || raw.startsWith("/admin/"))) return "/admin";
+  return raw;
+}
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/admin";
+  const nextPath = toSafeNextPath(searchParams.get("next"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,9 +30,9 @@ function LoginForm() {
     setError(null);
     setLoading(true);
     try {
-      const { accessToken } = await adminLogin(email.trim(), password);
-      localStorage.setItem(ADMIN_TOKEN_STORAGE_KEY, accessToken);
-      router.push(nextPath.startsWith("/") ? nextPath : "/admin");
+      await adminLogin(email.trim(), password);
+      router.push(nextPath);
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
     } finally {

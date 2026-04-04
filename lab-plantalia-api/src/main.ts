@@ -2,6 +2,7 @@ import './load-env';
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import type { NextFunction, Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
@@ -30,13 +31,40 @@ function resolveCorsOrigin(): boolean | string | string[] {
     return list.length === 1 ? list[0] : list;
   }
   if (process.env.NODE_ENV === 'production') {
-    return true;
+    throw new Error(
+      'CORS_ORIGINS es obligatorio en producción. Define una lista separada por comas.',
+    );
   }
   return DEV_FRONTEND_ORIGINS;
 }
 
+function applySecurityHeaders(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), browsing-topics=()',
+  );
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader(
+      'Strict-Transport-Security',
+      'max-age=63072000; includeSubDomains; preload',
+    );
+  }
+  next();
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  if (process.env.RATE_LIMIT_TRUST_PROXY?.trim() === 'true') {
+    app.getHttpAdapter().getInstance().set('trust proxy', true);
+  }
+  app.use(applySecurityHeaders);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -46,7 +74,7 @@ async function bootstrap() {
   );
   /**
    * CORS: en desarrollo, orígenes en DEV_FRONTEND_ORIGINS (Next :3100 o :3000).
-   * En producción: CORS_ORIGINS o reflect any origin si no está definida.
+   * En producción: CORS_ORIGINS es obligatoria.
    * Métodos/cabeceras explícitos para que el preflight OPTIONS de POST JSON no falle.
    */
   app.enableCors({
@@ -64,8 +92,13 @@ async function bootstrap() {
       'admin-jwt',
     )
     .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+  const swaggerEnabled =
+    process.env.SWAGGER_ENABLED?.trim() === 'true' ||
+    process.env.NODE_ENV !== 'production';
+  if (swaggerEnabled) {
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   const port = parseInt(process.env.PORT ?? '', 10) || 3101;
   await app.listen(port, '0.0.0.0');

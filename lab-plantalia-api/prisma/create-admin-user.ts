@@ -9,20 +9,18 @@ import { createPgAdapterFromEnv } from '../src/prisma/pg-adapter';
  * Crea o actualiza un AdminUser sin tocar catálogo ni pedidos.
  * Uso: npm run prisma:create-admin
  * Opcional: ADMIN_CREATE_EMAIL, ADMIN_CREATE_PASSWORD en .env
- *
- * Valores por defecto (cambiar en producción): mismo par que añade prisma/seed.ts
  */
-const DEFAULT_EMAIL = 'plantalia.lab@gmail.com';
-const DEFAULT_PASSWORD = 'plantalia2027';
-
 async function main(): Promise<void> {
-  const email = (
-    process.env.ADMIN_CREATE_EMAIL?.trim() || DEFAULT_EMAIL
-  ).toLowerCase();
-  const password =
-    process.env.ADMIN_CREATE_PASSWORD?.trim() || DEFAULT_PASSWORD;
-  if (password.length < 8) {
-    console.error('La contraseña debe tener al menos 8 caracteres.');
+  const email = process.env.ADMIN_CREATE_EMAIL?.trim().toLowerCase() ?? '';
+  const password = process.env.ADMIN_CREATE_PASSWORD?.trim() ?? '';
+  if (!email || !password) {
+    console.error(
+      'Debes definir ADMIN_CREATE_EMAIL y ADMIN_CREATE_PASSWORD para crear o actualizar un admin.',
+    );
+    process.exit(1);
+  }
+  if (password.length < 12) {
+    console.error('La contraseña debe tener al menos 12 caracteres.');
     process.exit(1);
   }
 

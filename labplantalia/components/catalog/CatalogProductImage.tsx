@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import { isSafeForNextImage } from "@/lib/isSafeForNextImage";
-
 type CatalogProductImageProps = {
   src: string;
   alt: string;
@@ -21,7 +19,8 @@ export function CatalogProductImage({
 }: CatalogProductImageProps) {
   const trimmed = (src ?? "").trim();
   const label = alt.trim() || "Sin imagen de producto";
-  const useNext = trimmed.length > 0 && isSafeForNextImage(trimmed);
+  const isRemote = /^https?:\/\//i.test(trimmed);
+  const useNext = trimmed.length > 0 && (trimmed.startsWith("/") || isRemote);
 
   if (!useNext) {
     const position = fill ? "absolute inset-0" : "";
@@ -39,11 +38,12 @@ export function CatalogProductImage({
   return (
     <Image
       src={trimmed}
-      alt={alt}
+      alt={label}
       fill={fill}
       sizes={sizes}
       className={className}
       priority={priority}
+      unoptimized={isRemote}
     />
   );
 }

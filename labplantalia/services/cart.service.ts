@@ -4,9 +4,28 @@ import type { CheckoutPayload, CheckoutResponseApi } from "@/lib/types/checkout-
 
 const STORAGE_KEY = "plantalia-cart-id";
 
+function isUuidLike(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  );
+}
+
+function normalizeCartErrorMessage(message: string): string {
+  if (message === "Producto no encontrado") {
+    return "El producto ya no está disponible con el identificador anterior. Recarga la página e inténtalo nuevamente.";
+  }
+  return message;
+}
+
 export function readStoredCartId(): string | null {
   if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(STORAGE_KEY);
+  const stored = window.localStorage.getItem(STORAGE_KEY);
+  if (!stored) return null;
+  if (!isUuidLike(stored)) {
+    window.localStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+  return stored;
 }
 
 export function writeStoredCartId(cartId: string): void {
@@ -24,8 +43,12 @@ async function readErrorMessage(res: Response): Promise<string> {
     const data: unknown = await res.json();
     if (data && typeof data === "object" && "message" in data) {
       const m = (data as { message: unknown }).message;
-      if (typeof m === "string") return m;
-      if (Array.isArray(m)) return m.filter((x) => typeof x === "string").join(", ");
+      if (typeof m === "string") return normalizeCartErrorMessage(m);
+      if (Array.isArray(m)) {
+        return normalizeCartErrorMessage(
+          m.filter((x) => typeof x === "string").join(", "),
+        );
+      }
     }
   } catch {
     /* ignore */

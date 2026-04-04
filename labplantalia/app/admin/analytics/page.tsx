@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { TopProductsAnalytics } from "@/components/admin/TopProductsAnalytics";
-import { ADMIN_TOKEN_STORAGE_KEY } from "@/lib/admin/token-storage";
 import type { TopProductSold } from "@/lib/types/analytics-api";
 import { fetchTopProductsSold } from "@/services/admin-analytics.service";
 
@@ -13,12 +12,10 @@ export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) return;
     setLoadError(null);
     setLoading(true);
     try {
-      const list = await fetchTopProductsSold(token);
+      const list = await fetchTopProductsSold();
       setRows(list);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : "No se pudieron cargar las ventas.");

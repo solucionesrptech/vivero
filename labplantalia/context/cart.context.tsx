@@ -116,12 +116,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setCartId(next.id);
       writeStoredCartId(next.id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo agregar al carrito");
+      const message =
+        e instanceof Error ? e.message : "No se pudo agregar al carrito";
+      setError(message);
+      if (message.includes("identificador anterior")) {
+        router.refresh();
+      }
       throw e;
     } finally {
       setIsSyncing(false);
     }
-  }, []);
+  }, [router]);
 
   const runLineMutation = useCallback(
     async (itemId: string, fn: () => Promise<CartApi>) => {

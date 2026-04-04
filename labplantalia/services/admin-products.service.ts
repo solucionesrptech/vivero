@@ -1,17 +1,27 @@
-import { getPlantaliaApiBaseUrl } from "@/lib/config/plantalia-api";
 import type {
   AdminProductCreated,
   AdminProductRow,
   CreateAdminProductPayload,
 } from "@/lib/types/admin-api";
 
+function normalizeAdminProductError(message: string): string {
+  if (message === "Producto no encontrado") {
+    return "El producto ya no existe o cambió de identificador. Recarga el listado e inténtalo de nuevo.";
+  }
+  return message;
+}
+
 async function readErrorMessage(res: Response): Promise<string> {
   try {
     const data: unknown = await res.json();
     if (data && typeof data === "object" && "message" in data) {
       const m = (data as { message: unknown }).message;
-      if (typeof m === "string") return m;
-      if (Array.isArray(m)) return m.filter((x) => typeof x === "string").join(", ");
+      if (typeof m === "string") return normalizeAdminProductError(m);
+      if (Array.isArray(m)) {
+        return normalizeAdminProductError(
+          m.filter((x) => typeof x === "string").join(", "),
+        );
+      }
     }
   } catch {
     /* ignore */
@@ -19,17 +29,9 @@ async function readErrorMessage(res: Response): Promise<string> {
   return "Error al contactar el servidor.";
 }
 
-function adminHeaders(token: string): HeadersInit {
-  return {
-    Accept: "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-}
-
-export async function fetchAdminProducts(token: string): Promise<AdminProductRow[]> {
-  const res = await fetch(`${getPlantaliaApiBaseUrl()}/admin/products`, {
+export async function fetchAdminProducts(): Promise<AdminProductRow[]> {
+  const res = await fetch("/api/admin/products", {
     method: "GET",
-    headers: adminHeaders(token),
     cache: "no-store",
   });
   if (!res.ok) {
@@ -39,16 +41,15 @@ export async function fetchAdminProducts(token: string): Promise<AdminProductRow
 }
 
 export async function patchAdminProductStock(
-  token: string,
   productId: string,
   delta: number,
 ): Promise<AdminProductRow> {
   const res = await fetch(
-    `${getPlantaliaApiBaseUrl()}/admin/products/${encodeURIComponent(productId)}/stock`,
+    `/api/admin/products/${encodeURIComponent(productId)}/stock`,
     {
       method: "PATCH",
       headers: {
-        ...adminHeaders(token),
+        Accept: "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ delta }),
@@ -61,13 +62,12 @@ export async function patchAdminProductStock(
 }
 
 export async function postAdminProduct(
-  token: string,
   body: CreateAdminProductPayload,
 ): Promise<AdminProductCreated> {
-  const res = await fetch(`${getPlantaliaApiBaseUrl()}/admin/products`, {
+  const res = await fetch("/api/admin/products", {
     method: "POST",
     headers: {
-      ...adminHeaders(token),
+      Accept: "application/json",
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),

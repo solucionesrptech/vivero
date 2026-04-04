@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ADMIN_TOKEN_STORAGE_KEY } from "@/lib/admin/token-storage";
 import {
   adminCategorySelectOptions,
   type PlantaliaCategorySlug,
@@ -29,11 +28,6 @@ export default function AdminNewProductPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitError(null);
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) {
-      setSubmitError("No hay sesión. Vuelve a iniciar sesión.");
-      return;
-    }
     const priceNum = Number.parseInt(price, 10);
     const stockNum = Number.parseInt(stock, 10);
     if (!Number.isFinite(priceNum) || priceNum < 1) {
@@ -46,7 +40,7 @@ export default function AdminNewProductPage() {
     }
     setSubmitting(true);
     try {
-      const row = await postAdminProduct(token, {
+      const row = await postAdminProduct({
         name: name.trim(),
         description: description.trim(),
         price: priceNum,

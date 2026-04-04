@@ -6,6 +6,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUrl,
   MaxLength,
   Min,
   MinLength,
@@ -51,6 +52,7 @@ export class CreateAdminProductDto {
     description: 'URL pública de la imagen',
   })
   @IsString()
+  @IsUrl({ require_protocol: true, protocols: ['http', 'https'] })
   @MinLength(1)
   @MaxLength(2048)
   imageUrl: string;

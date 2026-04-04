@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ADMIN_TOKEN_STORAGE_KEY } from "@/lib/admin/token-storage";
 
 type AdminAuthGuardProps = {
   children: React.ReactNode;
@@ -13,12 +12,31 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) {
-      router.replace("/login?next=/admin");
-      return;
+    let cancelled = false;
+
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/admin/session", {
+          method: "GET",
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          throw new Error("UNAUTHORIZED");
+        }
+        if (!cancelled) {
+          setReady(true);
+        }
+      } catch {
+        if (cancelled) return;
+        const nextPath = `${window.location.pathname}${window.location.search}`;
+        router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+      }
     }
-    setReady(true);
+
+    void checkSession();
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   if (!ready) {
