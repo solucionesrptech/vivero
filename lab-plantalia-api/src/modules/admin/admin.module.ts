@@ -1,18 +1,21 @@
 import { Module } from '@nestjs/common';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { OrderModule } from '../order/order.module';
-import { AdminJwtGuard } from './admin-jwt.guard';
-import { AdminAuthBll } from './admin-auth.bll';
-import { AdminAuthController } from './admin-auth.controller';
-import { AdminAuthDal } from './admin-auth.dal';
-import { AdminAuthFacade } from './admin-auth.facade';
-import { AdminOrderBll } from './admin-order.bll';
-import { AdminOrderController } from './admin-order.controller';
-import { AdminOrderFacade } from './admin-order.facade';
-import { AdminProductBll } from './admin-product.bll';
-import { AdminProductController } from './admin-product.controller';
-import { AdminProductDal } from './admin-product.dal';
-import { AdminProductFacade } from './admin-product.facade';
+import { AdminJwtGuard } from './controller/admin-jwt.guard';
+import { AdminAuthBll } from './bll/admin-auth.bll';
+import { AdminAuthController } from './controller/admin-auth.controller';
+import { AdminAuthDal } from './dal/admin-auth.dal';
+import { AdminAuthFacade } from './facade/admin-auth.facade';
+import { AdminDomainExceptionFilter } from './controller/admin-domain-exception.filter';
+import { AdminLoginRateLimitGuard } from './controller/admin-login-rate-limit.guard';
+import { AdminJwtService } from './controller/admin-jwt.service';
+import { AdminOrderBll } from './bll/admin-order.bll';
+import { AdminOrderController } from './controller/admin-order.controller';
+import { AdminOrderFacade } from './facade/admin-order.facade';
+import { AdminProductBll } from './bll/admin-product.bll';
+import { AdminProductController } from './controller/admin-product.controller';
+import { AdminProductDal } from './dal/admin-product.dal';
+import { AdminProductFacade } from './facade/admin-product.facade';
 
 @Module({
   imports: [OrderModule, NotificationsModule],
@@ -25,6 +28,9 @@ import { AdminProductFacade } from './admin-product.facade';
     AdminAuthDal,
     AdminAuthBll,
     AdminAuthFacade,
+    AdminDomainExceptionFilter,
+    AdminLoginRateLimitGuard,
+    AdminJwtService,
     AdminProductDal,
     AdminProductBll,
     AdminProductFacade,
@@ -32,5 +38,6 @@ import { AdminProductFacade } from './admin-product.facade';
     AdminOrderFacade,
     AdminJwtGuard,
   ],
+  exports: [AdminJwtService, AdminJwtGuard],
 })
 export class AdminModule {}

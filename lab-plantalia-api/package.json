@@ -12,7 +12,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node scripts/pre-nest-start.cjs && nest start",
     "start:dev": "node scripts/pre-nest-start.cjs && nest start --watch",
-    "start:debug": "node scripts/pre-nest-start.cjs && nest start --debug --watch",
+    "start:debug": "powershell -NoProfile -Command \"$env:NODE_OPTIONS=''; $env:VSCODE_INSPECTOR_OPTIONS=''; node scripts/pre-nest-start.cjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npx nest start --debug --watch\"",
     "start:prod": "node dist/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -22,7 +22,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed",
     "prisma:studio": "prisma studio --browser none",
     "studio": "prisma studio --browser none",
     "prisma:create-admin": "ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" prisma/create-admin-user.ts"
@@ -30,7 +29,9 @@
   "overrides": {
     "path-to-regexp": "8.4.1",
     "picomatch": "4.0.4",
-    "ajv": "8.18.0"
+    "ajv": "8.18.0",
+    "defu": "6.1.6",
+    "lodash": "4.18.1"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.17",

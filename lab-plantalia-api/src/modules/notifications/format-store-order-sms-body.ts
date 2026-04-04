@@ -2,7 +2,7 @@ import type { ClosedOrderNotifyPayload } from './closed-order-notify.types';
 
 const SMS_BODY_MAX = 420;
 
-const SMS_HEADER_PREFIX = 'Gracias por su compra en Vivero Plantalia';
+const SMS_HEADER_PREFIX = 'Gracias por su compra en Vivero Plantalia\n';
 
 /** Alineado con política V1 tienda (envío a domicilio). */
 const SMS_DELIVERY_CARRIER_NOTE = 'Blue Express; flete al entregar';

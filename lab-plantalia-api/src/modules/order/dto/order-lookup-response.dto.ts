@@ -16,13 +16,7 @@ export class OrderLookupItemResponseDto {
 
 export class OrderLookupResponseDto {
   @ApiProperty()
-  id: string;
-
-  @ApiProperty()
   publicCode: string;
-
-  @ApiProperty()
-  createdAt: string;
 
   @ApiProperty()
   status: string;
@@ -32,12 +26,6 @@ export class OrderLookupResponseDto {
 
   @ApiProperty()
   deliveryType: string;
-
-  @ApiProperty()
-  customerName: string;
-
-  @ApiProperty()
-  customerPhone: string;
 
   @ApiPropertyOptional()
   deliveryAddress: string | null;

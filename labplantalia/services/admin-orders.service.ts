@@ -1,13 +1,4 @@
-import { getPlantaliaApiBaseUrl } from "@/lib/config/plantalia-api";
 import type { AdminOrderDetail, AdminOrderListRow } from "@/lib/types/admin-orders-api";
-
-function adminHeaders(token: string): HeadersInit {
-  return {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-}
 
 async function readErrorMessage(res: Response): Promise<string> {
   try {
@@ -22,13 +13,10 @@ async function readErrorMessage(res: Response): Promise<string> {
   }
   return "No se pudo completar la operación.";
 }
-
-const base = () => getPlantaliaApiBaseUrl();
-
-export async function fetchAdminOrders(token: string): Promise<AdminOrderListRow[]> {
-  const res = await fetch(`${base()}/admin/orders`, {
+export async function fetchAdminOrders(): Promise<AdminOrderListRow[]> {
+  const res = await fetch("/api/admin/orders", {
     cache: "no-store",
-    headers: adminHeaders(token),
+    headers: { Accept: "application/json" },
   });
   if (!res.ok) {
     throw new Error(await readErrorMessage(res));
@@ -37,14 +25,13 @@ export async function fetchAdminOrders(token: string): Promise<AdminOrderListRow
 }
 
 export async function fetchAdminOrderDetail(
-  token: string,
   orderId: string,
 ): Promise<AdminOrderDetail> {
   const res = await fetch(
-    `${base()}/admin/orders/${encodeURIComponent(orderId)}`,
+    `/api/admin/orders/${encodeURIComponent(orderId)}`,
     {
       cache: "no-store",
-      headers: adminHeaders(token),
+      headers: { Accept: "application/json" },
     },
   );
   if (!res.ok) {
@@ -54,15 +41,17 @@ export async function fetchAdminOrderDetail(
 }
 
 export async function patchAdminOrderStatus(
-  token: string,
   orderId: string,
   status: string,
 ): Promise<AdminOrderDetail> {
   const res = await fetch(
-    `${base()}/admin/orders/${encodeURIComponent(orderId)}/status`,
+    `/api/admin/orders/${encodeURIComponent(orderId)}/status`,
     {
       method: "PATCH",
-      headers: adminHeaders(token),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify({ status }),
     },
   );

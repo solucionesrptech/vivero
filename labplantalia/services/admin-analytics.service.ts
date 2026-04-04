@@ -1,4 +1,3 @@
-import { getPlantaliaApiBaseUrl } from "@/lib/config/plantalia-api";
 import type { TopProductSold } from "@/lib/types/analytics-api";
 
 async function readErrorMessage(res: Response): Promise<string> {
@@ -15,17 +14,10 @@ async function readErrorMessage(res: Response): Promise<string> {
   return "Error al contactar el servidor.";
 }
 
-function adminHeaders(token: string): HeadersInit {
-  return {
-    Accept: "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-}
-
-export async function fetchTopProductsSold(token: string): Promise<TopProductSold[]> {
-  const res = await fetch(`${getPlantaliaApiBaseUrl()}/analytics/top-products`, {
+export async function fetchTopProductsSold(): Promise<TopProductSold[]> {
+  const res = await fetch("/api/admin/analytics/top-products", {
     method: "GET",
-    headers: adminHeaders(token),
+    headers: { Accept: "application/json" },
     cache: "no-store",
   });
   if (!res.ok) {

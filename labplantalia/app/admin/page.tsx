@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ADMIN_TOKEN_STORAGE_KEY } from "@/lib/admin/token-storage";
 import type { AdminProductRow } from "@/lib/types/admin-api";
 import {
   fetchAdminProducts,
@@ -16,12 +15,10 @@ export default function AdminDashboardPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) return;
     setLoadError(null);
     setLoadingList(true);
     try {
-      const list = await fetchAdminProducts(token);
+      const list = await fetchAdminProducts();
       setRows(list);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : "No se pudo cargar el listado.");
@@ -35,16 +32,18 @@ export default function AdminDashboardPage() {
   }, [load]);
 
   async function adjust(productId: string, delta: number) {
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) return;
     setBusyId(productId);
     try {
-      const updated = await patchAdminProductStock(token, productId, delta);
+      const updated = await patchAdminProductStock(productId, delta);
       setRows((prev) =>
         prev.map((r) => (r.id === updated.id ? { ...r, stock: updated.stock } : r)),
       );
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : "Error al actualizar stock.");
+      const message = e instanceof Error ? e.message : "Error al actualizar stock.";
+      setLoadError(message);
+      if (message.includes("cambió de identificador")) {
+        await load();
+      }
     } finally {
       setBusyId(null);
     }

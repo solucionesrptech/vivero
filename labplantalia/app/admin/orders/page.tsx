@@ -8,7 +8,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ADMIN_TOKEN_STORAGE_KEY } from "@/lib/admin/token-storage";
 import type { AdminOrderDetail, AdminOrderListRow } from "@/lib/types/admin-orders-api";
 import {
   fetchAdminOrderDetail,
@@ -60,12 +59,10 @@ export default function AdminOrdersPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) return;
     setLoadError(null);
     setLoadingList(true);
     try {
-      const list = await fetchAdminOrders(token);
+      const list = await fetchAdminOrders();
       setRows(list);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : "No se pudo cargar los pedidos.");
@@ -84,19 +81,17 @@ export default function AdminOrdersPage() {
   );
 
   async function onPreparado(row: AdminOrderListRow) {
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) return;
     setBusyId(row.id);
     setLoadError(null);
     try {
-      let d: AdminOrderDetail = await fetchAdminOrderDetail(token, row.id);
+      let d: AdminOrderDetail = await fetchAdminOrderDetail(row.id);
       if (d.status === "CONFIRMED") {
-        d = await patchAdminOrderStatus(token, row.id, "AWAITING_PREPARATION");
+        d = await patchAdminOrderStatus(row.id, "AWAITING_PREPARATION");
       }
       if (d.status === "AWAITING_PREPARATION") {
         const next =
           d.deliveryType === "DELIVERY" ? "READY_FOR_DELIVERY" : "READY_FOR_PICKUP";
-        d = await patchAdminOrderStatus(token, row.id, next);
+        d = await patchAdminOrderStatus(row.id, next);
       }
       await load();
     } catch (e) {
@@ -107,14 +102,12 @@ export default function AdminOrdersPage() {
   }
 
   async function onEntrega(row: AdminOrderListRow) {
-    const token = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
-    if (!token) return;
     setBusyId(row.id);
     setLoadError(null);
     try {
-      const d = await fetchAdminOrderDetail(token, row.id);
+      const d = await fetchAdminOrderDetail(row.id);
       const next = d.deliveryType === "DELIVERY" ? "DELIVERED" : "PICKED_UP";
-      await patchAdminOrderStatus(token, row.id, next);
+      await patchAdminOrderStatus(row.id, next);
       await load();
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : "No se pudo registrar la entrega.");

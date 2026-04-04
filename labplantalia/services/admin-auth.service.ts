@@ -1,6 +1,3 @@
-import { getPlantaliaApiBaseUrl } from "@/lib/config/plantalia-api";
-import type { AdminLoginResponse } from "@/lib/types/admin-api";
-
 async function readErrorMessage(res: Response): Promise<string> {
   try {
     const data: unknown = await res.json();
@@ -15,8 +12,8 @@ async function readErrorMessage(res: Response): Promise<string> {
   return "No se pudo iniciar sesión.";
 }
 
-export async function adminLogin(email: string, password: string): Promise<AdminLoginResponse> {
-  const res = await fetch(`${getPlantaliaApiBaseUrl()}/admin/auth/login`, {
+export async function adminLogin(email: string, password: string): Promise<void> {
+  const res = await fetch("/api/admin/login", {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ email, password }),
@@ -24,5 +21,4 @@ export async function adminLogin(email: string, password: string): Promise<Admin
   if (!res.ok) {
     throw new Error(await readErrorMessage(res));
   }
-  return res.json() as Promise<AdminLoginResponse>;
 }

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AnalyticsModule } from '../analytics/analytics.module';
-import { ProductBll } from './product.bll';
-import { ProductController } from './product.controller';
-import { ProductDal } from './product.dal';
-import { ProductFacade } from './product.facade';
+import { ProductBll } from './bll/product.bll';
+import { ProductController } from './controller/product.controller';
+import { ProductDal } from './dal/product.dal';
+import { ProductFacade } from './facade/product.facade';
 
 @Module({
   imports: [AnalyticsModule],
